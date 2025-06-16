@@ -1,5 +1,3 @@
-Elbette, işte İngilizce hazırlanmış, hem POST hem GET endpointlerini açıklayan, fonksiyon ve kullanım detaylarıyla tam kapsamlı bir `README.md` taslağı:
-
 ````markdown
 # DownSub API
 
