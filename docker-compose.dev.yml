@@ -1,0 +1,15 @@
+services:
+  downsub-api:
+    build: .
+    container_name: downsub-api
+    hostname: downsub-api
+    volumes:
+      - ./output:/app/output
+    networks:
+      - api-omnistart-network
+    restart: unless-stopped
+
+
+networks:
+  api-omnistart-network:
+    external: true
