@@ -51,7 +51,6 @@ def process_video(task_id: str, youtube_url: str, sub_lang: str = "en") -> str:
         safe_title = sanitize_filename(info.get("title", "video"))
         filename = f"{safe_title}-{task_id}.txt"
 
-
         vtt_file = os.path.join(output_dir, f"{video_id}.{sub_lang}.vtt")
         txt_file = os.path.join(output_dir, filename)
 
@@ -67,7 +66,7 @@ def process_video(task_id: str, youtube_url: str, sub_lang: str = "en") -> str:
             for line in vf:
                 line_stripped = line.strip()
                 # Zaman damgalarını ve boş satırları atla
-                if "-->" in line or not line_stripped == "":
+                if not line_stripped or "-->" in line_stripped:
                     continue
                 # Başlık satırlarını atla
                 if line_stripped in skip_header_lines:
@@ -75,6 +74,5 @@ def process_video(task_id: str, youtube_url: str, sub_lang: str = "en") -> str:
                 if line_stripped.startswith("Language: "):
                     continue
                 tf.write(line_stripped + "\n")
-
 
             return txt_file
