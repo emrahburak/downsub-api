@@ -3,6 +3,10 @@ services:
     build: .
     container_name: downsub-api
     hostname: downsub-api
+    environment:
+      - DOWNSUB_CLEANUP_ENABLED=true
+      - DOWNSUB_CLEANUP_AGE=300
+      - RESULT_OPTION=file
     volumes:
       - ./output:/app/output
     networks:

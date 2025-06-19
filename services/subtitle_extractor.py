@@ -1,8 +1,14 @@
 from yt_dlp import YoutubeDL
 import os
+import re
 
 
-def process_video(task_id: str, youtube_url: str) -> str:
+def sanitize_filename(name: str) -> str:
+    # Sadece harf, rakam, boşluk ve tireye izin ver, kalanları kaldır
+    return re.sub(r'[^a-zA-Z0-9\-_\s]', '', name).strip().replace(' ', '_')
+
+
+def process_video(task_id: str, youtube_url: str, sub_lang: str = "en") -> str:
     """
     TR:
     Verilen YouTube linkinden videoyu indirir, altyazıyı çeker,
@@ -28,14 +34,13 @@ def process_video(task_id: str, youtube_url: str) -> str:
     """
 
     output_dir = os.path.join(os.getcwd(), "output")
-    if output_dir is None:
-        os.makedirs(output_dir, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
 
     ydl_opts = {
         'skip_download': True,
         'writesubtitles': True,
         'writeautomaticsub': True,
-        'subtitleslangs': ['en'],
+        'subtitleslangs': [sub_lang],
         'outtmpl': os.path.join(output_dir, '%(id)s.%(ext)s'),
         'quiet': True,
     }
@@ -43,21 +48,33 @@ def process_video(task_id: str, youtube_url: str) -> str:
     with YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(youtube_url, download=True)
         video_id = info.get('id')
+        safe_title = sanitize_filename(info.get("title", "video"))
+        filename = f"{safe_title}-{task_id}.txt"
 
-    vtt_file = os.path.join(output_dir, f"{video_id}.en.vtt")
-    txt_file = os.path.join(output_dir, f"{task_id}.txt")
 
-    if not os.path.exists(vtt_file):
-        raise FileNotFoundError(f"Subtitle not found for video {video_id}")
+        vtt_file = os.path.join(output_dir, f"{video_id}.{sub_lang}.vtt")
+        txt_file = os.path.join(output_dir, filename)
 
-    with open(vtt_file,
-              'r', encoding='utf-8') as vf, open(txt_file,
-                                                 'w',
-                                                 encoding='utf-8') as tf:
-        for line in vf:
-            # Zaman damgalarını ve boş satırları atla
-            if "-->" in line or line.strip() == "":
-                continue
-            tf.write(line)
+        if not os.path.exists(vtt_file):
+            raise FileNotFoundError(f"Subtitle not found for video {video_id}")
 
-    return txt_file
+        with open(vtt_file, 'r',
+                  encoding='utf-8') as vf, open(txt_file,
+                                                'w',
+                                                encoding='utf-8') as tf:
+            skip_header_lines = {"WEBVTT", "Kind: captions"}
+
+            for line in vf:
+                line_stripped = line.strip()
+                # Zaman damgalarını ve boş satırları atla
+                if "-->" in line or not line_stripped == "":
+                    continue
+                # Başlık satırlarını atla
+                if line_stripped in skip_header_lines:
+                    continue
+                if line_stripped.startswith("Language: "):
+                    continue
+                tf.write(line_stripped + "\n")
+
+
+            return txt_file

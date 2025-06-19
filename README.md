@@ -1,4 +1,3 @@
-````markdown
 # DownSub API
 
 A simple FastAPI service that downloads YouTube video subtitles and extracts them as plain text files asynchronously.
