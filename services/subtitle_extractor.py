@@ -1,11 +1,6 @@
 from yt_dlp import YoutubeDL
 import os
-import re
-
-
-def sanitize_filename(name: str) -> str:
-    # Sadece harf, rakam, boşluk ve tireye izin ver, kalanları kaldır
-    return re.sub(r'[^a-zA-Z0-9\-_\s]', '', name).strip().replace(' ', '_')
+from .utils import clean_vtt_text, sanitize_filename
 
 
 def process_video(task_id: str, youtube_url: str, sub_lang: str = "en") -> str:
@@ -57,22 +52,15 @@ def process_video(task_id: str, youtube_url: str, sub_lang: str = "en") -> str:
         if not os.path.exists(vtt_file):
             raise FileNotFoundError(f"Subtitle not found for video {video_id}")
 
-        with open(vtt_file, 'r',
-                  encoding='utf-8') as vf, open(txt_file,
-                                                'w',
-                                                encoding='utf-8') as tf:
-            skip_header_lines = {"WEBVTT", "Kind: captions"}
+        # 1. VTT içeriğini oku
+        with open(vtt_file, 'r', encoding='utf-8') as vf:
+            vtt_content = vf.read()
 
-            for line in vf:
-                line_stripped = line.strip()
-                # Zaman damgalarını ve boş satırları atla
-                if not line_stripped or "-->" in line_stripped:
-                    continue
-                # Başlık satırlarını atla
-                if line_stripped in skip_header_lines:
-                    continue
-                if line_stripped.startswith("Language: "):
-                    continue
-                tf.write(line_stripped + "\n")
+        # 2. Temizle
+        cleaned_content = clean_vtt_text(vtt_content)
 
-            return txt_file
+        # 3. Temizlenmiş içeriği .txt dosyasına yaz
+        with open(txt_file, 'w', encoding='utf-8') as tf:
+            tf.write(cleaned_content)
+
+        return txt_file
