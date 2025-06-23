@@ -6,12 +6,14 @@ from typing import Optional
 
 from services.subtitle_extractor import process_video
 from services.utils import clean_old_files, str_to_bool, generate_unique_id, find_txt_file_path_by_task_id
+from services.config import OUTPUT_DIR
 import os
 from pathlib import Path
 
 CLEANUP_ENABLED = str_to_bool(os.getenv("DOWNSUB_CLEANUP_ENABLED", "false"))
 CLEANUP_AGE = int(os.getenv("DOWNSUB_CLEANUP_AGE", 86400))
 RESULT_OPTION = os.getenv("RESULT_OPTION", "json").lower()
+
 
 app = FastAPI()
 
@@ -72,10 +74,10 @@ def get_result(task_id: str):
     """
 
     if CLEANUP_ENABLED:
-        clean_old_files(folder_path="output", max_age_seconds=CLEANUP_AGE)
+        clean_old_files(folder_path=OUTPUT_DIR, max_age_seconds=CLEANUP_AGE)
 
    
-    raw_path = find_txt_file_path_by_task_id(task_id, output_dir="output")
+    raw_path = find_txt_file_path_by_task_id(task_id, output_dir=OUTPUT_DIR)
     if raw_path is None:
         return JSONResponse({"status": "processing"}, status_code=202)
 
@@ -94,7 +96,7 @@ def get_result(task_id: str):
             "content": content
         })
     else:
-        full_path = find_txt_file_path_by_task_id(task_id, output_dir="output")
+        full_path = find_txt_file_path_by_task_id(task_id, output_dir=OUTPUT_DIR)
 
         if full_path:
 

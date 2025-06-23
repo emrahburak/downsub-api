@@ -4,6 +4,75 @@ import shortuuid
 import re
 
 
+def get_subtitle_languages(info: dict) -> list[str]:
+    """
+    TR:
+    Video info'dan mevcut altyazı dillerinin tam listesini döner.
+    Hem 'subtitles' hem de 'automatic_captions' içindeki dilleri alır.
+
+    Args:
+        info (dict): yt-dlp extract_info sonucu
+
+    Returns:
+        list[str]: Mevcut altyazı dil kodlarının listesi
+
+
+    EN:
+    Returns the full list of available subtitle languages from video info.
+    Retrieves languages from both 'subtitles' and 'automatic_captions'.
+
+    Args:
+        info (dict): The result dictionary from yt-dlp's extract_info
+
+    Returns:
+        list[str]: List of available subtitle language codes
+    """
+    subs = info.get('subtitles', {})
+    auto_subs = info.get('automatic_captions', {})
+    all_langs = set(subs.keys()) | set(auto_subs.keys())
+    return sorted(all_langs)
+
+
+def find_matching_subtitle_lang(info_dict: dict,
+                                desired_lang: str) -> str | None:
+    """
+    TR:
+    Aranan dile en yakın uygun altyazı dilini döner.
+    Örneğin, 'en' verildiğinde mevcutsa 'en-GB' gibi benzer dil kodunu bulur.
+
+    Args:
+        info_dict (dict): yt-dlp'den alınan video bilgi sözlüğü
+        desired_lang (str): Kullanıcının istediği altyazı dili
+
+    Returns:
+        str | None: Eşleşen altyazı dili kodu veya bulunamazsa None
+
+
+    EN:
+    Returns the closest matching subtitle language for the requested language.
+    For example, if 'en' is requested and 'en-GB' exists, it will return 'en-GB'.
+
+    Args:
+        info_dict (dict): Video info dictionary from yt-dlp
+        desired_lang (str): Desired subtitle language code
+
+    Returns:
+        str | None: Matching subtitle language code or None if no match found
+    """
+    available_langs = get_subtitle_languages(info_dict)
+
+    # 1. Tam eşleşme
+    if desired_lang in available_langs:
+        return desired_lang
+
+    # 2. Prefix eşleşmesi (örnek: 'en' => 'en-GB')
+    for lang in available_langs:
+        if lang.startswith(desired_lang + "-"):
+            return lang
+
+    return None
+
+
 def sanitize_filename(name: str) -> str:
     """
     TR:

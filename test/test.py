@@ -82,6 +82,9 @@ if __name__ == "__main__":
     }, {
         "url": "https://www.youtube.com/watch?v=7mEztBsnEuo",
         "lang": "tr"
+    }, {
+        "url": "https://www.youtube.com/watch?v=XTsaZWzVJ4c",
+        "lang": "en"
     }]
 
     test_health_check()
