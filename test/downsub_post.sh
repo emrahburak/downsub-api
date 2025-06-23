@@ -1,25 +1,32 @@
 #!/bin/bash
 
-# Kullanım: ./downsub_request.sh <YouTube_URL> <Subtitle_Language_Code> <api=local|remote>
+# Kullanım: ./downsub_request.sh <API_URL> <api-type: local|remote>
 
-URL="$1"
-SUB_LANG="$2"
-API_TARGET="$3"
+API_URL="$1"
+API_TYPE="$2"
 
-if [ -z "$URL" ] || [ -z "$SUB_LANG" ] || [ -z "$API_TARGET" ]; then
-  echo "Kullanım: $0 <YouTube_URL> <Subtitle_Language_Code> <api=local|remote>"
+# Gömülü sabit değerler
+URL="https://www.youtube.com/watch?v=XTsaZWzVJ4c&t=1s"
+SUB_LANG="en"
+
+# Kontroller
+if [ -z "$API_URL" ] || [ -z "$API_TYPE" ]; then
+  echo "Kullanım: $0 <API_URL> <api-type: local|remote>"
   exit 1
 fi
 
-if [ "$API_TARGET" == "local" ]; then
-  API_URL="http://localhost:8080/downsub"
-elif [ "$API_TARGET" == "remote" ]; then
-  API_URL="https://api.omnistart.me/downsub"
-else
-  echo "Hatalı API hedefi: '$API_TARGET'. Sadece 'local' veya 'remote' kabul edilir."
+if [ "$API_TYPE" != "local" ] && [ "$API_TYPE" != "remote" ]; then
+  echo "Hatalı api-type: '$API_TYPE'. Sadece 'local' veya 'remote' olabilir."
   exit 1
 fi
 
+echo "İstek gönderiliyor:"
+echo "API URL   : $API_URL"
+echo "API Tipi  : $API_TYPE"
+echo "Video URL : $URL"
+echo "Dil Kodu  : $SUB_LANG"
+
+# İstek gönder
 curl -X POST "$API_URL" \
   -H "Content-Type: application/json" \
   -H "x-service: downsub-api" \

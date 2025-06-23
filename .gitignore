@@ -224,3 +224,5 @@ pyrightconfig.json
 
 output/
 output/*
+test/*.txt
+test/*.vtt
