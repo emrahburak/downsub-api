@@ -4,6 +4,7 @@ services:
     container_name: downsub-api
     hostname: downsub-api
     environment:
+      - ENVIRONMENT=docker
       - DOWNSUB_CLEANUP_ENABLED=true
       - DOWNSUB_CLEANUP_AGE=300
       - RESULT_OPTION=file
