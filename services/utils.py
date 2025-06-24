@@ -103,7 +103,7 @@ def sanitize_filename(name: str) -> str:
     return re.sub(r'[^a-zA-Z0-9\-_\s]', '', name).strip().replace(' ', '_')
 
 
-def clean_vtt_text(vtt_content: str) -> str:
+def clean_vtt_text(vtt_content: str, group_size: int = 3) -> str:
     """
     TR:
     Verilen VTT (WebVTT) formatındaki altyazı içeriğini temizler ve yalnızca düz metin olarak anlamlı satırları döner.
@@ -165,7 +165,18 @@ def clean_vtt_text(vtt_content: str) -> str:
             cleaned_lines.append(clean_line)
             previous_line = clean_line
 
-    return '\n'.join(cleaned_lines)
+    # Satırları gruplar halinde birleştir
+    paragraphs = []
+    buffer = []
+    for i, line in enumerate(cleaned_lines):
+        buffer.append(line)
+        if len(buffer) >= 3:  # Her 3 satırda bir paragraf yap
+            paragraphs.append(" ".join(buffer))
+            buffer = []
+    if buffer:
+        paragraphs.append(" ".join(buffer))  # Kalanları ekle
+
+    return "\n\n".join(paragraphs).strip()
 
 
 def generate_unique_id():

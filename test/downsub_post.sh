@@ -6,7 +6,8 @@ API_URL="$1"
 API_TYPE="$2"
 
 # Gömülü sabit değerler
-URL="https://www.youtube.com/watch?v=XTsaZWzVJ4c&t=1s"
+# URL="https://www.youtube.com/watch?v=XTsaZWzVJ4c&t=1s"
+URL="https://www.youtube.com/watch?v=va3kJ1YBBXo"
 SUB_LANG="en"
 
 # Kontroller
