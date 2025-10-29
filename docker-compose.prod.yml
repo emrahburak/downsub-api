@@ -11,10 +11,9 @@ services:
     volumes:
       - ./output:/app/output
     networks:
-      - api-omnistart-network
+      - api-aurensoft-network
     restart: unless-stopped
 
-
 networks:
-  api-omnistart-network:
+  api-aurensoft-network:
     external: true
